@@ -1,0 +1,9 @@
+package co.edu.cecar.smartbooks.screens
+
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+
+@Composable
+fun UsuariosScreen() {
+    Text("Usuarios")
+}
