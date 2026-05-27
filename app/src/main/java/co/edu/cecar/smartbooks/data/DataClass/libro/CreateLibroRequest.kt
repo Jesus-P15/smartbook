@@ -3,12 +3,11 @@ package co.edu.cecar.smartbooks.data.DataClass.libro
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class
-CreateLibroRequest(
-    val nombre: String? = null,
-    val nivel: String? = null,
-    val tipo: Int = 0,
-    val edicion: String? = null,
+data class CreateLibroRequest(
+    val nombre: String,
+    val nivel: String,
+    val tipo: Int,
+    val edicion: String,
     val unidades: Int = 0,
     val lote: Int = 0,
     val valorCompra: Double = 0.0,

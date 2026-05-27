@@ -2,21 +2,27 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+
+
 }
 
-android {
-    namespace = "co.edu.cecar.smartbooks"
-    compileSdk = 36
+    android {
+        namespace = "co.edu.cecar.smartbooks"
+        compileSdk {
+            version = release(36) {
+                minorApiLevel = 1
+            }
+        }
 
-    defaultConfig {
-        applicationId = "co.edu.cecar.smartbooks"
-        minSdk = 23
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        defaultConfig {
+            applicationId = "co.edu.cecar.smartbooks"
+            minSdk = 26
+            targetSdk = 36
+            versionCode = 1
+            versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
 
     buildTypes {
         release {
@@ -45,6 +51,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.room.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -53,20 +61,18 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     // Ktor (cliente HTTP para la API)
-    implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.serialization.kotlinx.json)
+    val ktor_version = "3.4.3"
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
 
-    // Serialización JSON
-    implementation(libs.kotlinx.serialization.json)
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
 
-    // DataStore (guardar el token JWT)
-    implementation(libs.androidx.datastore.preferences)
-
-    // Iconos extendidos
     implementation("androidx.compose.material:material-icons-extended")
 
 

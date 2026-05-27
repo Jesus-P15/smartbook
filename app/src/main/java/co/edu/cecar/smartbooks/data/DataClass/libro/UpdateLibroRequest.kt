@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class UpdateLibroRequest(
     val nombre: String? = null,
     val nivel: String? = null,
-    val tipo: Int = 0,
+    val tipo: Int? = null,
     val edicion: String? = null
 )
