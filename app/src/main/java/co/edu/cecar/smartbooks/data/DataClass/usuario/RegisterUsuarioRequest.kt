@@ -8,5 +8,6 @@ data class RegisterUsuarioRequest(
     val nombres: String? = null,
     val email: String? = null,
     val password: String? = null,
-    val rol: Int = 0
+    val rol: Int
 )
+

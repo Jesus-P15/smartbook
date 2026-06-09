@@ -1,6 +1,7 @@
 package co.edu.cecar.smartbooks.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import co.edu.cecar.smartbooks.data.network.SessionManager
 import co.edu.cecar.smartbooks.screens.LoginScreen
 import co.edu.cecar.smartbooks.screens.auth.RestablecerContrasenaScreen
 import co.edu.cecar.smartbooks.ui.screen.ClientesScreen
@@ -18,17 +20,30 @@ import co.edu.cecar.smartbooks.ui.screen.LibrosScreen
 import co.edu.cecar.smartbooks.ui.screen.LotesScreen
 import co.edu.cecar.smartbooks.ui.screen.UsuariosScreen
 import co.edu.cecar.smartbooks.ui.screen.VentasScreen
+import co.edu.cecar.smartbooks.ui.screen.auth.SolicitudRestablecimientoScreen
 import co.edu.cecar.smartbooks.ui.screen.clientes.EditarClienteScreen
 import co.edu.cecar.smartbooks.ui.screen.clientes.NuevoClienteScreen
 import co.edu.cecar.smartbooks.ui.screen.libros.NuevoLibroScreen
 import co.edu.cecar.smartbooks.ui.screen.libros.componentsLibros.EditarLibroScreen
+import co.edu.cecar.smartbooks.ui.screen.perfil.PerfilScreen
 import co.edu.cecar.smartbooks.viewmodel.ClientesViewModel
+import co.edu.cecar.smartbooks.viewmodel.LoginViewModel
 
 
 @Composable
 fun AppNavigation() {
 
     val backStack = rememberNavBackStack(LoginRoute)
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    val loginViewModel: LoginViewModel = viewModel()
+
+    fun cerrarSesion() {
+        loginViewModel.resetear()
+        SessionManager.cerrarSesion(context)
+        backStack.clear()
+        backStack.add(LoginRoute)
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -38,11 +53,12 @@ fun AppNavigation() {
 
             entry<LoginRoute> {
                LoginScreen(
-                    navegarADashboard = {
+                   viewModel = loginViewModel,
+                   navegarADashboard = {
                         backStack.add(DashboardRoute)
                     },
                     navegarAPantallaRestablecerContrasena = {
-                        backStack.add(RestablecerContrasenaRoute)
+                        backStack.add(SolicitudRestablecimientoRoute)
                     }
                 )
             }
@@ -51,6 +67,7 @@ fun AppNavigation() {
             entry<DashboardRoute> {
 
                 DashboardScreen(
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                     navegarAClientes = {
                         backStack.add(ClientesRoute)
@@ -75,20 +92,17 @@ fun AppNavigation() {
                     navegarAUsuarios = {
                         backStack.add(UsuariosRoute)
                     },
-
-                    navegarACerrarSesion = {
-                        backStack.clear()
-                        backStack.add(LoginRoute)
-                    }
+                    navegarACerrarSesion = {cerrarSesion()}
                 )
             }
 
             entry<ClientesRoute> {
 
-                val clientesViewModel: ClientesViewModel = viewModel()
+
 
                 ClientesScreen(
 
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                 navegarADashboard = {
 
@@ -116,10 +130,7 @@ fun AppNavigation() {
                     backStack.add(UsuariosRoute)
                 },
 
-                navegarACerrarSesion = {
-                    backStack.clear()
-                    backStack.add(LoginRoute)
-                },
+                navegarACerrarSesion = {cerrarSesion()},
 
                 navegarANuevoCliente = {
                     backStack.add(NuevoClienteRoute)
@@ -133,8 +144,11 @@ fun AppNavigation() {
 
             entry<LibrosRoute> {
 
+
                 var libroCreado by remember { mutableStateOf(false) }
                 LibrosScreen(
+
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                     navegarADashboard = {
 
@@ -160,10 +174,7 @@ fun AppNavigation() {
                     navegarAUsuarios = {
                         backStack.add(UsuariosRoute)
                     },
-                    navegarACerrarSesion = {
-                        backStack.clear()
-                        backStack.add(LoginRoute)
-                    },
+                    navegarACerrarSesion = {cerrarSesion() },
 
                     libroCreado = libroCreado,
 
@@ -179,6 +190,8 @@ fun AppNavigation() {
 
             entry<VentasRoute> {
                 VentasScreen(
+
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                     navegarADashboard = {
 
@@ -206,16 +219,14 @@ fun AppNavigation() {
                         backStack.add(UsuariosRoute)
                     },
 
-                    navegarACerrarSesion = {
-
-                        backStack.clear()
-                        backStack.add(LoginRoute)
-                    }
+                    navegarACerrarSesion = {cerrarSesion()}
                 )
             }
 
             entry<LotesRoute> {
                 LotesScreen(
+
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                     navegarADashboard = {
 
@@ -245,16 +256,14 @@ fun AppNavigation() {
                         backStack.add(UsuariosRoute)
                     },
 
-                    navegarACerrarSesion = {
-
-                        backStack.clear()
-                        backStack.add(LoginRoute)
-                    }
+                    navegarACerrarSesion = {cerrarSesion()}
                 )
             }
 
             entry<InventariosRoute> {
                 InventariosScreen(
+
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                     navegarADashboard = {
 
@@ -283,16 +292,21 @@ fun AppNavigation() {
                         backStack.add(UsuariosRoute)
                     },
 
-                    navegarACerrarSesion = {
-
-                        backStack.clear()
-                        backStack.add(LoginRoute)
-                    }
+                    navegarACerrarSesion = {cerrarSesion() }
                 )
             }
 
             entry<UsuariosRoute> {
+                val rol = remember { SessionManager.obtenerRol() }
+                if (!rol.equals("Admin", ignoreCase = true)) {
+                    LaunchedEffect(Unit) {
+                        backStack.removeLastOrNull()
+                    }
+                    return@entry
+                }
                 UsuariosScreen(
+
+                    navegarAPerfil = { backStack.add(PerfilRoute) },
 
                     navegarADashboard = {
 
@@ -321,23 +335,13 @@ fun AppNavigation() {
                     },
 
 
-                    navegarACerrarSesion = {
-
-                        backStack.clear()
-                        backStack.add(LoginRoute)
-                    }
+                    navegarACerrarSesion = {cerrarSesion()}
                 )
             }
-            entry<RestablecerContrasenaRoute> {
-              RestablecerContrasenaScreen(
 
-                    navegarALogin = {
-                        backStack.removeLastOrNull()
-                    }
 
-                )
 
-            }
+
             entry<NuevoLibroRoute> {
 
                 NuevoLibroScreen(
@@ -380,6 +384,53 @@ fun AppNavigation() {
                 )
             }
 
+            entry<SolicitudRestablecimientoRoute> {
+                SolicitudRestablecimientoScreen(
+                    navegarARestablecer = {
+                        backStack.add(RestablecerConCodigoRoute)
+                    },
+                    navegarAtras = {
+                        backStack.removeLastOrNull()
+                    }
+                )
+            }
+
+            entry<RestablecerConCodigoRoute> {
+                RestablecerContrasenaScreen(
+                    navegarALogin = {
+                        backStack.clear()
+                        backStack.add(LoginRoute)
+                    }
+                )
+            }
+
+            entry<PerfilRoute> {
+                PerfilScreen(
+                    navegarADashboard = {
+                        backStack.clear()
+                        backStack.add(DashboardRoute)
+                    },
+                    navegarAClientes = {
+                        backStack.add(ClientesRoute)
+                    },
+                    navegarALibros = {
+                        backStack.add(LibrosRoute)
+                    },
+                    navegarAVentas = {
+                        backStack.add(VentasRoute)
+                    },
+                    navegarALotes = {
+                        backStack.add(LotesRoute)
+                    },
+                    navegarAInventarios = {
+                        backStack.add(InventariosRoute)
+                    },
+                    navegarAUsuarios = {
+                        backStack.add(UsuariosRoute)
+                    },
+                    navegarACerrarSesion = {cerrarSesion()}
+                )
+            }
 
         }
     )

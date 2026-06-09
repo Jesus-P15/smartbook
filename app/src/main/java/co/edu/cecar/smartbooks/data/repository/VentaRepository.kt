@@ -1,15 +1,13 @@
 package co.edu.cecar.smartbooks.data.repository
 
-
-
 import co.edu.cecar.smartbooks.data.Constants.Constants
+import co.edu.cecar.smartbooks.data.Constants.controlError.safeApiCall
 import co.edu.cecar.smartbooks.data.DataClass.venta.CreateVentaRequest
 import co.edu.cecar.smartbooks.data.DataClass.venta.VentaResponse
 import co.edu.cecar.smartbooks.data.network.HttpClientProvider
 import co.edu.cecar.smartbooks.data.network.SessionManager
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 
 class VentaRepository {
@@ -17,53 +15,51 @@ class VentaRepository {
     private val client = HttpClientProvider.client
     private val baseUrl = "${Constants.BASE_URL}/api/Ventas"
 
-    // ── GET /api/Ventas ────────────────────────────────────────────────────────
-    suspend fun obtenerVentas(): Result<List<VentaResponse>> {
-        return try {
-            val response = client.get(baseUrl) {
+    suspend fun obtenerVentas(): Result<List<VentaResponse>> =
+        safeApiCall {
+            client.get(baseUrl) {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
-            }
-            val texto = response.bodyAsText()
-            println("JSON VENTAS: $texto")
-            Result.success(response.body<List<VentaResponse>>())
-        } catch (e: Exception) {
-            println("ERROR VENTAS: ${e.message}")
-            e.printStackTrace()
-            Result.failure(e)
+            }.body()
         }
-    }
 
-    // ── GET /api/Ventas/{id} ───────────────────────────────────────────────────
-    suspend fun obtenerVentaPorId(id: Int): Result<VentaResponse> {
-        return try {
-            val response = client.get("$baseUrl/$id") {
+    suspend fun obtenerVentaPorId(id: Int): Result<VentaResponse> =
+        safeApiCall {
+            client.get("$baseUrl/$id") {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
-            }
-            val texto = response.bodyAsText()
-            println("JSON VENTA $id: $texto")
-            Result.success(response.body<VentaResponse>())
-        } catch (e: Exception) {
-            println("ERROR VENTA $id: ${e.message}")
-            e.printStackTrace()
-            Result.failure(e)
+            }.body()
         }
-    }
 
-    // ── POST /api/Ventas ───────────────────────────────────────────────────────
-    suspend fun crearVenta(request: CreateVentaRequest): Result<VentaResponse> {
-        return try {
-            val response = client.post(baseUrl) {
+    suspend fun crearVenta(request: CreateVentaRequest): Result<VentaResponse> =
+        safeApiCall {
+            client.post(baseUrl) {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
                 contentType(ContentType.Application.Json)
                 setBody(request)
-            }
-            val texto = response.bodyAsText()
-            println("JSON CREAR VENTA: $texto")
-            Result.success(response.body<VentaResponse>())
-        } catch (e: Exception) {
-            println("ERROR CREAR VENTA: ${e.message}")
-            e.printStackTrace()
-            Result.failure(e)
+            }.body()
         }
-    }
+
+
+    /* PATCH /api/Usuarios/{id}/estado
+  suspend fun cambiarEstado(id: Int, activo: Boolean): Result<Unit> = try {
+      val response = client.patch("$baseUrl/$id/estado") {
+          header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
+          contentType(ContentType.Application.Json)
+          setBody(mapOf("activo" to activo))
+      }
+      println("PATCH ESTADO USUARIO $id: ${response.status}")
+      Result.success(Unit)
+  } catch (e: Exception) {
+      println("ERROR ESTADO USUARIO: ${e.message}")
+      Result.failure(e)
+  }*/
+
+    /* GET /api/Usuarios/perfil
+    suspend fun obtenerPerfil(): Result<PerfilUsuarioResponse> = try {
+        val response = client.get("$baseUrl/perfil") {
+            header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
+        }
+        Result.success(response.body())
+    } catch (e: Exception) {
+        Result.failure(e)
+    }*/
 }

@@ -39,7 +39,9 @@ fun VentasScreen(
     navegarALotes: () -> Unit,
     navegarAInventarios: () -> Unit,
     navegarAUsuarios: () -> Unit,
-    navegarACerrarSesion: () -> Unit
+    navegarACerrarSesion: () -> Unit,
+    navegarAPerfil:() -> Unit
+
 ) {
     val viewModel: VentasViewModel = viewModel()
     val state by viewModel.state.collectAsState()
@@ -65,7 +67,9 @@ fun VentasScreen(
         navegarALotes = navegarALotes,
         navegarAInventarios = navegarAInventarios,
         navegarAUsuarios = navegarAUsuarios,
-        navegarACerrarSesion = navegarACerrarSesion
+        navegarACerrarSesion = navegarACerrarSesion,
+        navegarAPerfil= navegarAPerfil
+
     ) { padding ->
 
         Box(

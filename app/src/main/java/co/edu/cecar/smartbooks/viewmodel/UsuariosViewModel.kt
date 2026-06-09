@@ -54,8 +54,6 @@ class UsuariosViewModel : ViewModel() {
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password.asStateFlow()
 
-    private val _rol = MutableStateFlow(0) // 0=Admin, 1=Vendedor
-    val rol: StateFlow<Int> = _rol.asStateFlow()
 
     // Campos formulario editar usuario
     private val _editNombres = MutableStateFlow("")
@@ -64,11 +62,16 @@ class UsuariosViewModel : ViewModel() {
     private val _editEmail = MutableStateFlow("")
     val editEmail: StateFlow<String> = _editEmail.asStateFlow()
 
-    private val _editRol = MutableStateFlow(0)
-    val editRol: StateFlow<Int> = _editRol.asStateFlow()
+    private val _editRol = MutableStateFlow("Vendedor")
+    val editRol: StateFlow<String> = _editRol.asStateFlow()
 
     private val _editActivo = MutableStateFlow(true)
     val editActivo: StateFlow<Boolean> = _editActivo.asStateFlow()
+
+    private val _rol = MutableStateFlow("Vendedor")
+    val rol: StateFlow<String> = _rol.asStateFlow()
+
+
 
     // ── Carga ──────────────────────────────────────────────────────────────────
     fun cargarUsuarios() {
@@ -103,24 +106,46 @@ class UsuariosViewModel : ViewModel() {
         _nombres.value = ""
         _email.value = ""
         _password.value = ""
-        _rol.value = 1
+        _rol.value = "Vendedor"
         _state.update { it.copy(mostrarNuevoUsuario = true, errorCrear = null, usuarioCreadoExito = false) }
     }
 
-    fun cerrarNuevoUsuario() = _state.update { it.copy(mostrarNuevoUsuario = false, errorCrear = null) }
+    fun cerrarNuevoUsuario() {
+        _state.update { it.copy(mostrarNuevoUsuario = false, errorCrear = null) }
+        cargarUsuarios()
+    }
 
     fun onIdentificacionChange(v: String) { _identificacion.value = v }
     fun onNombresChange(v: String)        { _nombres.value = v }
     fun onEmailChange(v: String)          { _email.value = v }
     fun onPasswordChange(v: String)       { _password.value = v }
-    fun onRolChange(v: Int)               { _rol.value = v }
+
+    fun onRolChange(v: String) { _rol.value = v }
+
 
     fun crearUsuario() {
+
+
+        val rolId = when (_rol.value) {
+            "Admin" -> 1
+            "Vendedor" -> 2
+            else -> 2
+        }
+
         if (_identificacion.value.isBlank() || _nombres.value.isBlank() ||
             _email.value.isBlank() || _password.value.isBlank()) {
             _state.update { it.copy(errorCrear = "Todos los campos son requeridos") }
             return
         }
+        if (_password.value.length < 8) {
+            _state.update { it.copy(errorCrear = "La contraseña debe tener al menos 8 caracteres") }
+            return
+        }
+        if (_identificacion.value.length < 6) {
+            _state.update { it.copy(errorCrear = "La identificación debe tener al menos 6 dígitos") }
+            return
+        }
+
         viewModelScope.launch {
             _state.update { it.copy(creandoUsuario = true, errorCrear = null) }
             repository.crearUsuario(
@@ -129,13 +154,13 @@ class UsuariosViewModel : ViewModel() {
                     nombres = _nombres.value.trim(),
                     email = _email.value.trim(),
                     password = _password.value,
-                    rol = _rol.value
+                    rol = rolId
                 )
             ).onSuccess {
                 _state.update { it.copy(creandoUsuario = false, usuarioCreadoExito = true) }
                 cargarUsuarios()
             }.onFailure { e ->
-                _state.update { it.copy(creandoUsuario = false, errorCrear = "Error: ${e.message}") }
+                _state.update { it.copy(creandoUsuario = false, errorCrear = e.message ?: "Error al crear usuario") }
             }
         }
     }
@@ -144,7 +169,7 @@ class UsuariosViewModel : ViewModel() {
     fun abrirEditarUsuario(usuario: UsuarioResponse) {
         _editNombres.value = usuario.nombres
         _editEmail.value = usuario.email
-        _editRol.value = if (usuario.rol.equals("Admin", ignoreCase = true)) 0 else 1
+        _editRol.value = usuario.rol
         _editActivo.value = usuario.activo
         _state.update {
             it.copy(
@@ -156,14 +181,23 @@ class UsuariosViewModel : ViewModel() {
         }
     }
 
-    fun cerrarEditarUsuario() = _state.update { it.copy(mostrarEditarUsuario = false, errorEditar = null) }
-
+    fun cerrarEditarUsuario() {
+        _state.update { it.copy(mostrarEditarUsuario = false, errorEditar = null) }
+        cargarUsuarios()
+    }
     fun onEditNombresChange(v: String) { _editNombres.value = v }
     fun onEditEmailChange(v: String)   { _editEmail.value = v }
-    fun onEditRolChange(v: Int)        { _editRol.value = v }
+    fun onEditRolChange(v: String) { _editRol.value = v }
     fun onEditActivoChange(v: Boolean) { _editActivo.value = v }
 
     fun actualizarUsuario() {
+
+        val rolId = when (_editRol.value) {
+            "Admin" -> 1
+            "Vendedor" -> 2
+            else -> 2
+        }
+
         val usuario = _state.value.usuarioAEditar ?: return
         if (_editNombres.value.isBlank() || _editEmail.value.isBlank()) {
             _state.update { it.copy(errorEditar = "Nombre y email son requeridos") }
@@ -176,7 +210,7 @@ class UsuariosViewModel : ViewModel() {
                 request = UpdateUsuarioRequest(
                     nombres = _editNombres.value.trim(),
                     email = _editEmail.value.trim(),
-                    rol = _editRol.value,
+                    rol = rolId,
                     activo = _editActivo.value
                 )
             ).onSuccess {

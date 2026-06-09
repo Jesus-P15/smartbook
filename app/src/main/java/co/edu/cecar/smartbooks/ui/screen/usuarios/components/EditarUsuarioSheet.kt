@@ -92,10 +92,10 @@ fun EditarUsuarioSheet(
                 // Rol
                 Text("Rol", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(0 to "Admin", 1 to "Vendedor").forEach { (valor, etiqueta) ->
+                    listOf("Admin", "Vendedor").forEach { etiqueta ->
                         FilterChip(
-                            selected = rol == valor,
-                            onClick = { viewModel.onEditRolChange(valor) },
+                            selected = rol == etiqueta,
+                            onClick = { viewModel.onEditRolChange(etiqueta) },
                             label = { Text(etiqueta) }
                         )
                     }

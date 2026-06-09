@@ -39,8 +39,10 @@ fun UsuariosScreen(
     navegarALotes: () -> Unit,
     navegarAInventarios: () -> Unit,
     navegarAVentas: () -> Unit,
-    navegarACerrarSesion: () -> Unit
+    navegarACerrarSesion: () -> Unit,
+    navegarAPerfil:() -> Unit
 ) {
+
     val viewModel: UsuariosViewModel = viewModel()
     val state by viewModel.state.collectAsState()
     val usuariosFiltrados by remember(state) {
@@ -64,7 +66,9 @@ fun UsuariosScreen(
         navegarALotes = navegarALotes,
         navegarAInventarios = navegarAInventarios,
         navegarAUsuarios = {},
-        navegarACerrarSesion = navegarACerrarSesion
+        navegarACerrarSesion = navegarACerrarSesion,
+        navegarAPerfil = navegarAPerfil
+
     ) { padding ->
 
         Box(

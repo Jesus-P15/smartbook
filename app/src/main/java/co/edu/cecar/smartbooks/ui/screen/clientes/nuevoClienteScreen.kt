@@ -155,8 +155,7 @@ fun NuevoClienteScreen(
                 }
             }
 
-            // ── Botón guardar ─────────────────────────────────────────────
-            Button(
+             Button(
                 onClick = { viewModel.guardar { onClienteCreado() } },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isGuardando,

@@ -21,7 +21,7 @@ data class NuevoLibroFormState(
     val guardadoExitoso: Boolean = false
 )
 
-val tiposDeLibro = listOf("Workbook", "Textbook", "Activity Book")
+val tiposDeLibro = listOf("Workbook", "Textbook")
 
 fun NuevoLibroFormState.validar(): NuevoLibroFormState {
     return copy(

@@ -64,5 +64,6 @@ object HttpClientProvider {
         engine {
             dispatcher = Dispatchers.IO
         }
+        expectSuccess = true
     }
 }

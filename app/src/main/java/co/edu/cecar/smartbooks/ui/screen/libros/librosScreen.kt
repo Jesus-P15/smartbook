@@ -32,6 +32,8 @@ fun LibrosScreen(
     navegarANuevoLibro: () -> Unit,
     navegarAEditarLibro: (LibroId: Int) -> Unit,
     libroCreado: Boolean = false,
+    navegarAPerfil:() -> Unit
+
 ) {
     val viewModel = remember { LibrosViewModel() }
     val libros by viewModel.libros.collectAsState()
@@ -44,8 +46,6 @@ fun LibrosScreen(
     }
 
     var query by remember { mutableStateOf("") }
-
-
 
     val librosFiltrados = remember(query, libros) {
         if (query.isBlank()) libros
@@ -65,7 +65,9 @@ fun LibrosScreen(
         navegarALotes = navegarALotes,
         navegarAInventarios = navegarAInventarios,
         navegarAUsuarios = navegarAUsuarios,
-        navegarACerrarSesion = navegarACerrarSesion
+        navegarACerrarSesion = navegarACerrarSesion,
+        navegarAPerfil = navegarAPerfil
+
     ) { padding ->
 
         LazyColumn(

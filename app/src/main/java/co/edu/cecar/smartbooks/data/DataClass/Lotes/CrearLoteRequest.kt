@@ -1,8 +1,8 @@
-package co.edu.cecar.smartbooks.data.DataClass.Lotes
+    package co.edu.cecar.smartbooks.data.DataClass.Lotes
 
-import kotlinx.serialization.Serializable
+    import kotlinx.serialization.Serializable
 
-@Serializable
-data class CrearLoteRequest(
-    val lote: Int = 0
-)
+    @Serializable
+    data class CrearLoteRequest(
+        val lote: Int = 0
+    )

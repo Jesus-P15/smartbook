@@ -42,6 +42,12 @@ data object PerfilRoute: NavKey
 @Serializable
 data object RestablecerContrasenaRoute: NavKey
 
+@Serializable
+object SolicitudRestablecimientoRoute: NavKey
+
+@Serializable
+object RestablecerConCodigoRoute: NavKey
+
 
 // Data class para editar
 

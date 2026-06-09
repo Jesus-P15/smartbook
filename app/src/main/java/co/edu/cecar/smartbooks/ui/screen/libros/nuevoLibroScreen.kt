@@ -57,8 +57,8 @@ fun NuevoLibroScreen(
                         snackbarHostState.showSnackbar("✅ Libro creado exitosamente")
 
                     }
+                    navegarAtras()
                 }
-                navegarAtras()
             }
         )
     }

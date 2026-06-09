@@ -1,4 +1,4 @@
-package co.edu.cecar.smartbooks.screens.auth
+package co.edu.cecar.smartbooks.ui.screen.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -18,11 +18,16 @@ import co.edu.cecar.smartbooks.ui.theme.RojoInstitucional
 import co.edu.cecar.smartbooks.viewmodel.RestablecerViewModel
 
 @Composable
-fun RestablecerContrasenaScreen(
-    navegarALogin: () -> Unit
+fun SolicitudRestablecimientoScreen(
+    navegarARestablecer: () -> Unit,
+    navegarAtras: () -> Unit
 ) {
     val viewModel: RestablecerViewModel = viewModel()
-    val state by viewModel.restablecerState.collectAsState()
+    val state by viewModel.solicitudState.collectAsState()
+
+    LaunchedEffect(state.exito) {
+        if (state.exito) navegarARestablecer()
+    }
 
     AuthBackground {
         Column(
@@ -40,14 +45,14 @@ fun RestablecerContrasenaScreen(
                 Spacer(Modifier.height(20.dp))
 
                 Text(
-                    "Nueva contraseña",
+                    "Recuperar contraseña",
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    "Ingresa el código que recibiste y tu nueva contraseña.",
+                    "Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -56,27 +61,9 @@ fun RestablecerContrasenaScreen(
                 Spacer(Modifier.height(20.dp))
 
                 AuthTextField(
-                    value = state.codigo,
-                    onValueChange = viewModel::onCodigoChange,
-                    label = "Código de verificación"
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                AuthTextField(
-                    value = state.nuevaContrasena,
-                    onValueChange = viewModel::onNuevaContrasenaChange,
-                    label = "Nueva contraseña",
-                    isPassword = true
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                AuthTextField(
-                    value = state.confirmarContrasena,
-                    onValueChange = viewModel::onConfirmarContrasenaChange,
-                    label = "Confirmar contraseña",
-                    isPassword = true
+                    value = state.email,
+                    onValueChange = viewModel::onEmailChange,
+                    label = "Correo Electrónico"
                 )
 
                 state.error?.let {
@@ -93,7 +80,7 @@ fun RestablecerContrasenaScreen(
                 Spacer(Modifier.height(20.dp))
 
                 Button(
-                    onClick = { viewModel.restablecerContrasena { navegarALogin() } },
+                    onClick = { viewModel.solicitarRestablecimiento() },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = RojoInstitucional),
                     enabled = !state.isLoading
@@ -105,17 +92,17 @@ fun RestablecerContrasenaScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Restablecer contraseña")
+                        Text("Enviar código")
                     }
                 }
 
                 Spacer(Modifier.height(12.dp))
 
                 OutlinedButton(
-                    onClick = navegarALogin,
+                    onClick = navegarAtras,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Volver al login")
+                    Text("Volver")
                 }
             }
         }

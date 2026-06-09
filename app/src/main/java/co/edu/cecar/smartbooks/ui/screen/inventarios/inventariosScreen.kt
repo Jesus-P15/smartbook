@@ -53,7 +53,9 @@ fun InventariosScreen(
     navegarAVentas: () -> Unit,
     navegarALotes: () -> Unit,
     navegarAUsuarios: () -> Unit,
-    navegarACerrarSesion: () -> Unit
+    navegarACerrarSesion: () -> Unit,
+    navegarAPerfil:() -> Unit
+
 ) {
     val viewModel: InventariosViewModel = viewModel()
     val state by viewModel.state.collectAsState()
@@ -72,7 +74,9 @@ fun InventariosScreen(
         navegarALotes = navegarALotes,
         navegarAInventarios = {},
         navegarAUsuarios = navegarAUsuarios,
-        navegarACerrarSesion = navegarACerrarSesion
+        navegarACerrarSesion = navegarACerrarSesion,
+        navegarAPerfil = navegarAPerfil
+
     ) { padding ->
 
         LazyColumn(

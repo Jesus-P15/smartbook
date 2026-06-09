@@ -1,14 +1,14 @@
 package co.edu.cecar.smartbooks.data.repository
 
 import co.edu.cecar.smartbooks.data.Constants.Constants
+import co.edu.cecar.smartbooks.data.Constants.controlError.safeApiCall
 import co.edu.cecar.smartbooks.data.DataClass.cliente.ClienteResponse
 import co.edu.cecar.smartbooks.data.DataClass.cliente.CreateClienteRequest
 import co.edu.cecar.smartbooks.data.DataClass.cliente.UpdateClienteRequest
 import co.edu.cecar.smartbooks.data.network.HttpClientProvider
 import co.edu.cecar.smartbooks.data.network.SessionManager
-import io.ktor.client.call.body
+import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 
 class ClienteRepository {
@@ -16,61 +16,36 @@ class ClienteRepository {
     private val client = HttpClientProvider.client
     private val baseUrl = "${Constants.BASE_URL}/api/Clientes"
 
-    suspend fun obtenerClientes(): Result<List<ClienteResponse>> {
-        return try {
-            val response = client.get(baseUrl) {
+    suspend fun obtenerClientes(): Result<List<ClienteResponse>> =
+        safeApiCall {
+            client.get(baseUrl) {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
-            }
-            Result.success(response.body<List<ClienteResponse>>())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
+            }.body()
         }
-    }
 
-    suspend fun obtenerClientePorIdentificacion(identificacion: String): Result<ClienteResponse> {
-        return try {
-            val response = client.get("$baseUrl/$identificacion") {
+    suspend fun obtenerClientePorIdentificacion(identificacion: String): Result<ClienteResponse> =
+        safeApiCall {
+            client.get("$baseUrl/$identificacion") {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
-            }
-            val texto = response.bodyAsText()
-            println("JSON CLIENTE: $texto")
-            Result.success(response.body())
-        } catch (e: Exception) {
-            println("ERROR CLIENTE: ${e.message}")
-            e.printStackTrace()
-            Result.failure(e)
+            }.body()
         }
-    }
 
-    suspend fun crearCliente(request: CreateClienteRequest): Result<ClienteResponse> {
-        return try {
-            val response = client.post(baseUrl) {
+    suspend fun crearCliente(request: CreateClienteRequest): Result<ClienteResponse> =
+        safeApiCall {
+            client.post(baseUrl) {
+                header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }.body()
+        }
+
+    suspend fun editarCliente(identificacion: String, request: UpdateClienteRequest): Result<Unit> =
+        safeApiCall {
+            client.put("$baseUrl/$identificacion") {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
                 contentType(ContentType.Application.Json)
                 setBody(request)
             }
-            Result.success(response.body())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
+            Unit
         }
-    }
-
-    suspend fun editarCliente(
-        identificacion: String,
-        request: UpdateClienteRequest
-    ): Result<Unit> {
-        return try {
-            val response = client.put("$baseUrl/$identificacion") {
-                header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
-                contentType(ContentType.Application.Json)
-                setBody(request)
-            }
-            Result.success(response.body())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
-        }
-    }
 }

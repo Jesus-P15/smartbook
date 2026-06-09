@@ -43,6 +43,7 @@ import co.edu.cecar.smartbooks.viewmodel.ClientesViewModel
             navegarACerrarSesion: () -> Unit,
             navegarANuevoCliente: () -> Unit = {},
             navegarAEditarCliente: (identificacion: String) -> Unit = {},
+            navegarAPerfil: () -> Unit
             ) {
 
 
@@ -81,7 +82,8 @@ import co.edu.cecar.smartbooks.viewmodel.ClientesViewModel
                 navegarALotes = navegarALotes,
                 navegarAInventarios = navegarAInventarios,
                 navegarAUsuarios = navegarAUsuarios,
-                navegarACerrarSesion = navegarACerrarSesion
+                navegarACerrarSesion = navegarACerrarSesion,
+                navegarAPerfil = navegarAPerfil
             ) { padding ->
 
                 LazyColumn(
