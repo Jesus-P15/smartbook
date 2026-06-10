@@ -99,11 +99,16 @@ fun MainLayout(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(20.dp))
 
+                DrawerItem("Dashboard",   Icons.Default.Home,          "dashboard",   navegarADashboard)
+                DrawerItem("Clientes",    Icons.Default.Person,        "clientes",    navegarAClientes)
+                DrawerItem("Libros",      Icons.Default.Book,          "libros",      navegarALibros)
+                DrawerItem("Ventas",      Icons.Default.ShoppingCart,  "ventas",      navegarAVentas)
                 DrawerItem("Lotes",       Icons.Default.Inventory,     "lotes",       navegarALotes)
                 DrawerItem("Inventarios", Icons.Default.List,          "inventarios", navegarAInventarios)
                 if (esAdmin) {
                     DrawerItem("Usuarios", Icons.Default.ManageAccounts, "usuarios", navegarAUsuarios)
                 }
+                DrawerItem("Perfil",      Icons.Default.AccountCircle, "perfil",      navegarAPerfil)
 
                 Spacer(modifier = Modifier.weight(1f))
 
