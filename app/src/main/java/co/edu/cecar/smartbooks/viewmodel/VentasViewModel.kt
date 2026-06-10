@@ -3,10 +3,14 @@ package co.edu.cecar.smartbooks.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.edu.cecar.smartbooks.data.DataClass.Lotes.LoteResponse
+import co.edu.cecar.smartbooks.data.DataClass.libro.LibroResponse
 import co.edu.cecar.smartbooks.data.DataClass.usuario.UsuarioResponse
 import co.edu.cecar.smartbooks.data.DataClass.venta.CreateVentaItemRequest
 import co.edu.cecar.smartbooks.data.DataClass.venta.CreateVentaRequest
 import co.edu.cecar.smartbooks.data.DataClass.venta.VentaResponse
+import co.edu.cecar.smartbooks.data.repository.LibroRepository
+import co.edu.cecar.smartbooks.data.repository.LotesRepository
 import co.edu.cecar.smartbooks.data.repository.VentaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +35,11 @@ data class VentasUiState(
     val mostrarNuevaVenta: Boolean = false,
     val creandoVenta: Boolean = false,
     val errorCrear: String? = null,
-    val ventaCreadaExito: Boolean = false
+    val ventaCreadaExito: Boolean = false,
+
+    val libros: List<LibroResponse> = emptyList(),
+    val lotes: List<LoteResponse> = emptyList(),
+    val busquedaLibro: String = ""
 )
 
 data class ItemVentaUi(
@@ -42,6 +50,8 @@ data class ItemVentaUi(
 
 // ── ViewModel ──────────────────────────────────────────────────────────────────
 class VentasViewModel : ViewModel() {
+
+
 
     private val repository = VentaRepository()
 
@@ -59,6 +69,10 @@ class VentasViewModel : ViewModel() {
 
     private val _items = MutableStateFlow<List<ItemVentaUi>>(listOf(ItemVentaUi()))
     val items: StateFlow<List<ItemVentaUi>> = _items.asStateFlow()
+
+    private val librosRepository = LibroRepository()
+    private val lotesRepository = LotesRepository()
+
 
     // ── Carga ──────────────────────────────────────────────────────────────────
     fun cargarVentas() {
@@ -83,6 +97,37 @@ class VentasViewModel : ViewModel() {
     fun onFechaDesdeChange(value: String) = _state.update { it.copy(fechaDesde = value) }
     fun onFechaHastaChange(value: String) = _state.update { it.copy(fechaHasta = value) }
     fun onBusquedaChange(value: String)   = _state.update { it.copy(busqueda = value) }
+
+    init {
+        cargarLibros()
+        cargarLotes()
+    }
+
+    fun cargarLibros() {
+        viewModelScope.launch {
+            librosRepository.obtenerLibros()
+                .onSuccess { lista -> _state.update { it.copy(libros = lista) } }
+                .onFailure { }
+        }
+    }
+
+    fun cargarLotes() {
+        viewModelScope.launch {
+            lotesRepository.obtenerLotes()
+                .onSuccess { lista -> _state.update { it.copy(lotes = lista) } }
+                .onFailure { }
+        }
+    }
+
+    fun onBusquedaLibroChange(v: String) = _state.update { it.copy(busquedaLibro = v) }
+
+    fun librosFiltrados(): List<LibroResponse> {
+        val s = _state.value
+        if (s.busquedaLibro.isBlank()) return s.libros
+        return s.libros.filter { it.nombre.contains(s.busquedaLibro, ignoreCase = true) }
+    }
+
+
 
     fun limpiarFiltros() = _state.update {
         it.copy(fechaDesde = "", fechaHasta = "", busqueda = "")

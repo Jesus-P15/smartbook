@@ -20,9 +20,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.edu.cecar.smartbooks.data.network.SessionManager
 import co.edu.cecar.smartbooks.ui.screen.components.MainLayout
+import co.edu.cecar.smartbooks.ui.screen.components.VentaHoyCard
 import co.edu.cecar.smartbooks.ui.theme.AzulOscuro
 import co.edu.cecar.smartbooks.ui.theme.RojoInstitucional
 import co.edu.cecar.smartbooks.viewmodel.DashboardViewModel
@@ -45,7 +49,14 @@ fun DashboardScreen(
     val dashboard by viewModel.dashboard.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // Nombre del usuario logueado desde el token
+    // ── Recarga cada vez que la pantalla vuelve al foco ───────────────────
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.cargarDashboard()
+        }
+    }
+
     val nombreUsuario = remember {
         SessionManager.obtenerPerfil()?.nombres?.split(" ")?.firstOrNull() ?: "Usuario"
     }
@@ -71,7 +82,6 @@ fun DashboardScreen(
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
 
-            // ── Banner de bienvenida ───────────────────────────────────────
             item {
                 Box(
                     modifier = Modifier
@@ -99,7 +109,6 @@ fun DashboardScreen(
                 }
             }
 
-            // ── Métricas ───────────────────────────────────────────────────
             item {
                 Column(
                     modifier = Modifier
@@ -117,7 +126,9 @@ fun DashboardScreen(
 
                     if (isLoading) {
                         Box(
-                            modifier = Modifier.fillMaxWidth().height(120.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(120.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(color = RojoInstitucional)
@@ -158,8 +169,7 @@ fun DashboardScreen(
                                 icono = Icons.Outlined.AttachMoney,
                                 label = "Ingresos mes",
                                 valor = dashboard?.totalVentasMes?.let {
-                                    NumberFormat.getCurrencyInstance(Locale("es", "CO"))
-                                        .format(it)
+                                    NumberFormat.getCurrencyInstance(Locale("es", "CO")).format(it)
                                 } ?: "—",
                                 color = RojoInstitucional,
                                 valorPequeno = true
@@ -169,7 +179,6 @@ fun DashboardScreen(
                 }
             }
 
-            // ── Acciones rápidas ───────────────────────────────────────────
             item {
                 Column(
                     modifier = Modifier
@@ -210,7 +219,6 @@ fun DashboardScreen(
                 }
             }
 
-            // ── Ventas de hoy ──────────────────────────────────────────────
             item {
                 Column(
                     modifier = Modifier
@@ -248,7 +256,6 @@ fun DashboardScreen(
                 }
             }
 
-            // ── Lista ventas hoy o estado vacío ───────────────────────────
             val ventas = dashboard?.ventasHoy
             if (ventas.isNullOrEmpty()) {
                 item {
@@ -306,8 +313,6 @@ fun DashboardScreen(
         }
     }
 }
-
-// ── Componentes ───────────────────────────────────────────────────────────────
 
 @Composable
 private fun MetricaCard(
@@ -399,72 +404,3 @@ private fun AccionRapidaBtn(
     }
 }
 
-@Composable
-private fun VentaHoyCard(
-    modifier: Modifier = Modifier,
-    numeroRecibo: String,
-    cliente: String,
-    total: Double,
-    fecha: String
-) {
-    Card(
-        modifier = modifier.padding(bottom = 8.dp),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Avatar con inicial del cliente
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(AzulOscuro.copy(alpha = 0.10f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = cliente.firstOrNull()?.uppercase() ?: "?",
-                    fontWeight = FontWeight.Bold,
-                    color = AzulOscuro,
-                    fontSize = 16.sp
-                )
-            }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = cliente,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "Recibo #$numeroRecibo",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = NumberFormat.getCurrencyInstance(Locale("es", "CO")).format(total),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = RojoInstitucional
-                )
-                Text(
-                    text = fecha.take(10),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}

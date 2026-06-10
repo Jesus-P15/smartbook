@@ -23,15 +23,15 @@ class LibroRepository {
             }.body()
         }
 
-    suspend fun crearLibro(request: CreateLibroRequest): Result<LibroResponse> =
+    suspend fun crearLibro(request: CreateLibroRequest): Result<Unit> =
         safeApiCall {
             client.post(baseUrl) {
                 header(HttpHeaders.Authorization, "Bearer ${SessionManager.obtenerToken()}")
                 contentType(ContentType.Application.Json)
                 setBody(request)
-            }.body()
+            }
+            Unit
         }
-
     suspend fun editarLibro(id: Int, request: UpdateLibroRequest): Result<Unit> =
         safeApiCall {
             client.put("$baseUrl/$id") {
