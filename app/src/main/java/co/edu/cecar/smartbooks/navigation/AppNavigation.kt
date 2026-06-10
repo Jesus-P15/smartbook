@@ -300,7 +300,8 @@ fun AppNavigation() {
                 val rol = remember { SessionManager.obtenerRol() }
                 if (!rol.equals("Admin", ignoreCase = true)) {
                     LaunchedEffect(Unit) {
-                        backStack.removeLastOrNull()
+                        backStack.clear()
+                        backStack.add(DashboardRoute)
                     }
                     return@entry
                 }
@@ -428,10 +429,9 @@ fun AppNavigation() {
                     navegarAUsuarios = {
                         backStack.add(UsuariosRoute)
                     },
-                    navegarACerrarSesion = {cerrarSesion()}
+                    navegarACerrarSesion = { cerrarSesion() }
                 )
             }
-
         }
     )
 }
